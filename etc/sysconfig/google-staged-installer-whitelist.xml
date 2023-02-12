@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+  <whitelisted-staged-installer package="com.android.vending" isModulesInstaller="true" />
+  <whitelisted-staged-installer package="com.google.android.GoogleCamera" />
+</config>

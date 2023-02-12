@@ -1,0 +1,39 @@
+#!/sbin/sh
+
+set -x
+exec 2>&1
+outfd="/proc/self/fd/${2}";
+modname="gappsk";
+rootpart="/data";
+zipfile="${3}";
+
+ps | grep zygote | grep -v grep >/dev/null && bootmode=true || bootmode=false;
+${bootmode} || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && bootmode=true;
+${bootmode} && filedir="${TMPDIR:-/dev/tmp}/${modname}" || filedir="/tmp/${modname}";
+${bootmode} && modulesdir="${rootpart}/adb/modules_update" || modulesdir="${rootpart}/adb/modules";
+
+abort(){
+  echo "Failed: ${1}"
+  rm -rf "${root}"; exit 1
+}
+
+root="${modulesdir}/${modname}";
+mkdir -p "${root}" "${filedir}";
+chown -R 0:0 "${modulesdir}"; find "${modulesdir}" -type d -print0 | xargs -0 -n1 -- chmod a+rx; find "${modulesdir}" -type f -print0 | xargs -0 -n1 -- chmod a+r;
+unzip -o "${zipfile}" -d "${filedir}" || abort "Could not unzip ${zipfile}";
+cp -r "${filedir}/module.prop" "${filedir}/post-fs-data.sh" "${filedir}/service.sh" "${filedir}/system" "${root}/" || abort "Could not install module contents in ${root}";
+#cp "${filedir}/module.prop" "${root}/module.prop"
+touch "${root}/auto_mount" || abort "Could not create auto_mount in ${root}";
+if [ "${modulesdir}" = "${rootpart}/adb/modules_update" ]; then
+  modmnt="${rootpart}/adb/modules";
+  mkdir -p "${modmnt}/${modname}";
+  touch "${modmnt}/${modname}/update" || abort "Could not create update in ${modmnt}/${modname}";
+  cp "${filedir}/module.prop" "${modmnt}/${modname}/module.prop" || abort "Could not create module.prop in ${modmnt}/${modname}";
+fi;
+
+find "${root}/system" -type d -print0 | xargs -0 -n1 -- chmod a+rx;
+find "${root}/system" -type f -print0 | xargs -0 -n1 -- chmod a+r;
+find "${root}" -maxdepth 1 -print0 | xargs -0 -n1 -- chmod a+rw;  # ??
+chcon -R 'u:object_r:system_file:s0' "${root}/system";
+touch "${root}/auto_mount" || abort "Could not create auto_mount in ${root}";
+echo "Done!";

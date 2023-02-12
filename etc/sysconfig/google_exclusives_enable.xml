@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <!-- This is meant to be the canonical feature identifying 2016 and newer Nexus devices. -->
+    <feature name="com.google.android.feature.PIXEL_EXPERIENCE" />
+
+    <!-- This is meant to be the canonical feature identifying 2017 and newer Nexus devices. -->
+    <feature name="com.google.android.feature.PIXEL_2017_EXPERIENCE" />
+
+    <!-- This is meant to be the canonical feature identifying 2018 and newer Pixel devices. -->
+    <feature name="com.google.android.feature.PIXEL_2018_EXPERIENCE" />
+
+    <!-- This is meant to be the canonical feature identifying 2019 and newer devices. -->
+    <feature name="com.google.android.feature.PIXEL_2019_EXPERIENCE" />
+
+    <!-- This is meant to be the canonical feature identifying 2019 mid year and newer devices. -->
+    <feature name="com.google.android.feature.PIXEL_2019_MIDYEAR_EXPERIENCE" />
+
+    <!-- This is meant to be the canonical feature identifying 2020 and newer devices. -->
+    <feature name="com.google.android.feature.PIXEL_2020_EXPERIENCE" />
+
+    <!-- This is meant to be the canonical feature identifying 2020 mid year and newer devices. -->
+    <feature name="com.google.android.feature.PIXEL_2020_MIDYEAR_EXPERIENCE" />
+
+    <!-- This is the canonical feature identifying devices which bundle Google Fi support. -->
+    <feature name="com.google.android.feature.GOOGLE_FI_BUNDLED" />
+
+    <!-- Feature flag on RVC builds for AER requirements. -->
+    <feature name="com.google.android.feature.AER_OPTIMIZED" />
+
+    <!-- The feature identifying devices which are able to use the Turbo app. -->
+    <feature name="com.google.android.feature.TURBO_PRELOAD" />
+
+    <!-- The feature identifying devices which are able to use the Android Wellbeing app. -->
+    <feature name="com.google.android.feature.WELLBEING" />
+
+    <!-- The AI services open-source network component can bind to the odad package. -->
+    <allow-association target="com.google.android.as.oss" allowed="com.google.android.odad" />
+
+    <!-- The odad package can only bind to the AI services open-source network component. -->
+    <allow-association target="com.google.android.odad" allowed="com.google.android.as.oss" />
+
+    <!-- Hide DocumentsUi Launcher/Downloads intent handling. -->
+    <component-override package="com.google.android.documentsui" >
+        <component class="com.android.documentsui.LauncherActivity" enabled="false" />
+        <component class="com.android.documentsui.ViewDownloadsActivity" enabled="false" />
+    </component-override>
+
+    <!-- ACTION_MANAGE_STORAGE handled by Files by Google -->
+    <component-override package="com.google.android.storagemanager" >
+        <component class="com.android.storagemanager.deletionhelper.DeletionHelperActivity" enabled="false" />
+    </component-override>
+
+    <!-- Make sure photos/video previews are handled by Photos. -->
+    <component-override package="com.google.android.apps.nbu.files" >
+        <component class="com.google.android.apps.nbu.files.gateway.preview.PreviewActivity" enabled="false" />
+    </component-override>
+
+    <!-- Display regulatory info in settings. -->
+    <component-override package="com.android.settings" >
+        <component class=".RegulatoryInfoDisplayActivity" enabled="true" />
+    </component-override>
+</config>

@@ -1,0 +1,115 @@
+variables:
+  PACKAGE_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/GAppsk"
+
+workflow:
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "web"
+
+build:
+  stage: build
+  image: alpine:edge
+  script: |
+    apk add --no-cache curl git zip; git submodule update --init; tag="$(date +%Y%m%d)" auth="JOB-TOKEN: ${CI_JOB_TOKEN}"
+    for api in $(seq 24 33); do for arch in arm arm64; do
+      ./build.sh "${arch}" "${api}"; rm -rf build;
+      mv "GAppsk-${arch}-api${api}.zip" "GAppsk-${arch}-api${api}-${tag}.zip"
+      sha512sum "GAppsk-${arch}-api${api}-${tag}.zip" >"GAppsk-${arch}-api${api}-${tag}.zip.sha512"
+      curl -s -o /dev/null -H "${auth}" -T "GAppsk-${arch}-api${api}-${tag}.zip" "${PACKAGE_URL}/${tag}/GAppsk-${arch}-api${api}-${tag}.zip"
+      curl -s -o /dev/null -H "${auth}" -T "GAppsk-${arch}-api${api}-${tag}.zip.sha512" "${PACKAGE_URL}/${tag}/GAppsk-${arch}-api${api}-${tag}.zip.sha512"
+      rm "GAppsk-${arch}-api${api}-${tag}.zip" "GAppsk-${arch}-api${api}-${tag}.zip.sha512"
+    done; done
+  #artifacts:
+  #  paths:
+  #  - "*.zip"
+  #  - "*.zip.sha256"
+  #  expire_in: 3 weeks
+
+publish:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script: echo
+  release:
+    tag_name: "$(date +%Y%m%d)"
+    description: "$(date +%Y%m%d)"
+    assets:
+      links:
+      - name: "GAppsk-arm-api24-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api24-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm-api24-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api24-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm-api25-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api25-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm-api25-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api25-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm-api26-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api26-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm-api26-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api26-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm-api27-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api27-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm-api27-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api27-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm-api28-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api28-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm-api28-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api28-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm-api29-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api29-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm-api29-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api29-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm-api30-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api30-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm-api30-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api30-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm-api31-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api31-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm-api31-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api31-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm-api32-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api32-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm-api32-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api32-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm-api33-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api33-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm-api33-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm-api33-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm64-api24-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api24-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm64-api24-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api24-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm64-api25-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api25-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm64-api25-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api25-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm64-api26-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api26-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm64-api26-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api26-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm64-api27-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api27-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm64-api27-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api27-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm64-api28-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api28-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm64-api28-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api28-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm64-api29-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api29-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm64-api29-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api29-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm64-api30-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api30-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm64-api30-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api30-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm64-api31-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api31-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm64-api31-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api31-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm64-api32-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api32-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm64-api32-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api32-$(date +%Y%m%d).zip.sha512"
+      - name: "GAppsk-arm64-api33-$(date +%Y%m%d)"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api33-$(date +%Y%m%d).zip"
+      - name: "GAppsk-arm64-api33-$(date +%Y%m%d) sha512"
+        url: "${PACKAGE_URL}/$(date +%Y%m%d)/GAppsk-arm64-api33-$(date +%Y%m%d).zip.sha512"
